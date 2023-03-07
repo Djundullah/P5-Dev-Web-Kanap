@@ -13,7 +13,8 @@ async function getProducts() {
   let htmlProduct = document.getElementById("items");
 
   // on boucle pour chaque element i du tableau
-  for (i = 0; i < data.length; i++) {
+  
+  for ( let i = 0; i < data.length; i++) {
     // product.html est la page suivante, elle doit savoir quel id trouver
       const html = `<a href="./product.html?id=${data[i]._id}">
             <article>
