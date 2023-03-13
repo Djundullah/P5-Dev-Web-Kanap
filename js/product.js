@@ -1,3 +1,5 @@
+import { getProducts } from "./script";
+
 // constante qui va récuperer l'adresse affichée
 const location = window.location;
 console.log("location", location);
@@ -50,49 +52,84 @@ async function getProductsById() {
       for (i = 0; i < data.colors.length; i++) {
         // pour chaque element i on crée option dans le DOM
         colors.innerHTML += `<option value="${data.colors[i]}">${data.colors[i]}</option>`;
-    }
-
+      }
     });
 }
 
 // la fonction qui va récuperer la valeur dans l'input quantity
 function getValueOfQuantity() {
-    // l'id quantity dans le DOM (l'input)
-    let quantity = document.getElementById("quantity");
+  // l'id quantity dans le DOM (l'input)
+  let quantity = document.getElementById("quantity");
 
+  // la regex
+  const quantityNb = /^[0-9]$|^[1-9][0-9]$|^(100)$/;
+
+  // condition, si la valeur est vide ou que la quantité est plus petite que zéro, on stop la fonction
+  if (quantity.value.trim() == "" || quantityNb.test(quantity.value) <= 0) {
+    return;
+
+    // sinon on récupère la valeur
+  } else if (quantityNb.test(quantity.value) >= 0) {
     // on va chercher les valeurs affichées dans l'input graca à 'input'
-    quantity.addEventListener('input', getValueOfQuantity, false);
-    // return quantity;
+    quantity.addEventListener("input", getValueOfQuantity, false);
+  }
+  // return quantity;
 
-    console.log("valueQuantity", quantity.value);
+  console.log("valueQuantity", quantity.value);
 }
 // La fonction qui va récuperer la valeur dans le select
-function getValueOfColor() {
-    let color = document.getElementById("colors");
-    // on va récuperer les valeurs à chaque changements d'évenement avec le "change"
-    color.addEventListener("change", getValueOfColor, false);
-    // return color;
-    console.log("getValueOfColor", color.value);
-    
-}
+async function getValueOfColor() {
+  let color = document.getElementById("colors");
+  // on cherche dans les données le produit avec le bon id
+  fetch(`http://localhost:3000/api/products/${id}`)
+    .then((response) => response.json())
+    // si on récupére des données
+    .then(
+      (data) => {
+        color.addEventListener("click", getValueOfColor, false);
 
+        let dataColors = data.colors;
+
+        let isOk = true;
+
+        let i = 0;
+        for (i = 0; i < data.colors.length; i++) {
+          if (dataColors[i] !== color.value) isOk = false;
+          else if (dataColors[i] === color.value) isOk = true;
+          console.log("isOk", isOk);
+          console.log("Colors", color.value);
+          // console.log("getValueOfColor", color.value);
+          // on va récuperer les valeurs à chaque changements d'évenement avec le "change"
+
+          if (isOk == true) {
+            console.log("TRUE");
+            color.addEventListener("click", getValueOfColor, false);
+          }
+        }
+        console.log("getValueOfColor", color.value);
+
+        // return getValueOfColor();
+      }
+      //  else
+      //     // on va récuperer les valeurs à chaque changements d'évenement avec le "change"
+      //     color.addEventListener("change", getValueOfColor, false);
+      // // return color;
+      // console.log("getValueOfColor", data.colors);
+      // console.log("getValueOfColor", color.value);
+    );
+}
 
 function addPanier() {
+  const btnAddToCart = document.getElementById("addToCart");
 
-    const btnAddToCart = document.getElementById("addToCart");
-
-    btnAddToCart.addEventListener("click", getValueOfQuantity, getValueOfColor);
-
-
-
+  btnAddToCart.addEventListener("click", getValueOfQuantity, getValueOfColor());
 }
 
-
 function init() {
-    getValueOfQuantity()
-    getProductsById();
-    getValueOfColor();
-    addPanier();
+  getValueOfQuantity();
+  getProductsById();
+  getValueOfColor();
+  addPanier();
 }
 
 init();
