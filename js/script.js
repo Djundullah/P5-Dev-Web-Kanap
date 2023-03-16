@@ -1,4 +1,4 @@
-export async function getProducts() {
+async function getProducts() {
   // creation de la variable qui va stocker les données
   // API for get requests
   let fetchRes = fetch("http://localhost:3000/api/products/");
