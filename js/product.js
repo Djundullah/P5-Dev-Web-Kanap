@@ -22,7 +22,9 @@ let description = document.getElementById("description");
 
 let colors = document.getElementById("colors"); // l'id quantity dans le DOM (l'input)
 let quantity = document.getElementById("quantity");
+let selectedColor = document.getElementById("selectedColor");
 const btnAddToCart = document.getElementById("addToCart");
+const quantityNb = /^[1-9]$|^[1-9][0-9]$|^100$/;
 
 // async function getProducts() {
 //   // creation de la variable qui va stocker les données
@@ -73,36 +75,32 @@ const getProductsById = () => {
 
         console.log(dataColors);
         const searchColor = e.target.value;
-        console.log("searchColor", searchColor);
+        //console.log("searchColor", searchColor);
 
         let colorValue = [searchColor];
 
-        btnAddToCart.addEventListener("click", function () {
-          let colorSelected = [[]];
-          // let index = quantitySelected.splice(0, 1);
-          for (let i = 0; i < dataColors.length; i++) {
-            if (dataColors[i] !== searchColor) return;
-            else if (dataColors[i] === searchColor)
-              console.log("dataColors[i]", dataColors[i]);
-            colorSelected.push(dataColors[i]);
-            // quantitySelected[0];
-            console.log("colorSelected", colorSelected);
-            // console.log("colorValue[i]", dataColors[i]);
-          }
-        });
+        // btnAddToCart.addEventListener("click", function () {
+        //   let colorSelected = [[]];
+        //   // let index = quantitySelected.splice(0, 1);
+        //   for (let i = 0; i < dataColors.length; i++) {
+        //     if (dataColors[i] !== searchColor) return;
+        //     else if (dataColors[i] === searchColor)
+        //       console.log("dataColors[i]", dataColors[i]);
+        //     colorSelected.push(dataColors[i]);
+        //     // quantitySelected[0];
+        //     console.log("colorSelected", colorSelected);
+        //     // console.log("colorValue[i]", dataColors[i]);
+        //   }
+        // });
       });
 
       // let colorSelected = [];
       // let quantitySelected = [];
       let quantityToCart = [];
 
-      // la regex
-      const quantityNb = /^[0-9]$|^[1-9][0-9]$|^(100)$/;
-
       quantity.addEventListener("input", (e) => {
         const searchQuantity = e.target.value;
-        console.log("searchQuantity", searchQuantity);
-
+        //console.log("searchQuantity", searchQuantity);
         let quantitySelected = [];
 
         // condition, si la valeur est vide ou que la quantité est plus petite que zéro, on stop la fonction
@@ -138,22 +136,62 @@ const getProductsById = () => {
         //   quantitySelected.push([index]);
         //   console.log("quantitySelected", quantitySelected);
         // }
+      });
 
-        btnAddToCart.addEventListener("click", function () {
-          // let index = quantitySelected.splice(0, 1);
-          for (let i = 0; i < quantityValue.length; i++) {
-            quantitySelected.push(quantityValue[0]);
-            // quantitySelected[0];
-            console.log("quantitySelected", quantitySelected);
-            console.log("quantityValue[i]", quantityValue[0]);
+      btnAddToCart.addEventListener("click", function () {
+        // Recuperation des caracteristiques de l'article
+        let selectedQuantity = quantity.value;
+        let selectedColor = colors.value;
+        let newArticle = {
+          id: id,
+          quantite: selectedQuantity,
+          color: selectedColor,
+        };
+        let panier = [];
+
+        // Verifier que la couleur et la quantite soit choisis (sinon on peut pas ajouter l'article)
+        if (quantityNb.test(quantity.value) && selectedColor) {
+          // On peut ajouter donc ajouter l'article au localStorage
+          let localStoragePanier = localStorage.getItem("panier");
+          if (!localStoragePanier) {
+            panier.push(newArticle);
+            localStorage.setItem("panier", JSON.stringify(panier));
+            // localStorage.setItem(key, value);
+          } else {
+            // L'element est deja stocke dans le localstorage
+            // on identifie un article par son id et sa couleur (deux objets de couleurs differentes seront considere comme deux articles differents)
+            panier = JSON.parse(localStoragePanier);
+
+            let indexOfArticle = panier.findIndex((localStorageArticle) => {
+              if (
+                localStorageArticle.id === id &&
+                localStorageArticle.color === selectedColor
+              ) {
+                return localStorageArticle;
+              }
+            });
+
+            // le panier contient deja l'article
+            if (indexOfArticle != -1) {
+              // Modifier la quantite
+              panier[indexOfArticle].quantite = selectedQuantity;
+              // ajouter dans le local storage
+              localStorage.setItem("panier", JSON.stringify(panier));
+
+              // ajouter dans panier sans creer de duplicata
+            } else {
+              // c'est un nouveau article
+              panier.push(newArticle);
+              localStorage.setItem("panier", JSON.stringify(panier));
+            }
           }
-          // quantityValue.splice(0, 1);
-          // const quantityIndex = quantitySelected.splice(index, 1);
-          // quantityToCart.push(quantityValue);
+        } else {
+          alert(
+            "Veuillez selectionner une quantite entre 1-100 et une couleur SVP"
+          );
+        }
 
-          // console.log("quantityToCart", quantityToCart);
-          // console.log("index", index);
-        });
+        // le cas echeant, ajouter un nouvelle element dans le localStorage
       });
     });
 };
@@ -229,9 +267,8 @@ async function getValueOfColor() {
 }
 
 function addPanier() {
-  const btnAddToCart = document.getElementById("addToCart");
-
-  btnAddToCart.addEventListener("click", getValueOfQuantity, getValueOfColor());
+  //const btnAddToCart = document.getElementById("addToCart");
+  //btnAddToCart.addEventListener("click", getValueOfQuantity, getValueOfColor());
 }
 
 function init() {
