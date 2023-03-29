@@ -106,8 +106,7 @@ function CalculTotalPrice() {
     let art = articles.find((a) => {
       return a._id == article.id;
     });
-    // Je sais pas pourquoi art peut etre undefined ici
-    if (art != undefined) {
+    if (art) {
       sumPrices =
         parseInt(sumPrices) + parseInt(article.quantite) * parseInt(art.price);
     }
