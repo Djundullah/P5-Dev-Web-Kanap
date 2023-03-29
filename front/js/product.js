@@ -54,20 +54,23 @@ const getProductsById = () => {
       // création de l'enfant dans la div
       itemImage.appendChild(image);
 
-      // on peut afficher le prix avec innerHTML ou aussi innerText
-      price.innerText = data.price;
+      // on peut afficher le prix avec appendChild ou aussi innerText
+      price.appendChild(document.createTextNode(data.price));
 
-      // on peut afficher le nom du produit avec innerHTML
-      title.innerHTML = data.name;
+      // on peut afficher le nom du produit avec appendChild
+      title.appendChild(document.createTextNode(data.name));
 
-      // on affiche la description avec innerHTML
-      description.innerHTML = data.description;
+      // on affiche la description avec appendChild
+      description.appendChild(document.createTextNode(data.description));
 
       // pour chaque couleur dans la data
       let i = 0;
       for (i = 0; i < data.colors.length; i++) {
         // pour chaque element i on crée option dans le DOM
-        colors.innerHTML += `<option value="${data.colors[i]}">${data.colors[i]}</option>`;
+        var option = document.createElement("option");
+        option.text = data.colors[i];
+        option.value = option.text;
+        colors.appendChild(option);
       }
 
       colors.addEventListener("change", (e) => {
@@ -174,7 +177,9 @@ const getProductsById = () => {
             // le panier contient deja l'article
             if (indexOfArticle != -1) {
               // Modifier la quantite
-              panier[indexOfArticle].quantite = selectedQuantity;
+              panier[indexOfArticle].quantite =
+                parseInt(panier[indexOfArticle].quantite) +
+                parseInt(selectedQuantity);
               // ajouter dans le local storage
               localStorage.setItem("panier", JSON.stringify(panier));
 

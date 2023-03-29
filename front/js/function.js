@@ -4,7 +4,7 @@ export function getProducts(dataFetched) {
   let fetchRes = fetch("http://localhost:3000/api/products/");
   // fetchRes is the promise to resolve
   // on stocke les données en json dans data
-  const data = await (await fetchRes).json();
+  const data = await(fetchRes).json();
   // on attribue le parametre a la fonction renderProducts
   console.log(data);
   data = dataFetched;
